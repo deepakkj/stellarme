@@ -1,0 +1,1 @@
+export default () => <div>Get your customized link!</div>

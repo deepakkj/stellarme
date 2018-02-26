@@ -14,7 +14,7 @@ export default ({ children, title = "This is the default title" }) => (
           <a>Home</a>
         </Link>{" "}
         |
-        <Link href="/contact">
+        <Link href="/get-link">
           <a>Get My Link</a>
         </Link>
       </nav>
@@ -22,6 +22,6 @@ export default ({ children, title = "This is the default title" }) => (
 
     {children}
 
-    <footer>{"I`m here to stay"}</footer>
+    <footer>{"I'm footer"}</footer>
   </div>
 );

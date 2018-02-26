@@ -4,17 +4,20 @@ import {
   initStore,
   getSenderAccountDetails,
   loaderStart,
-  getReceiverAccountDetails
+  getSenderAccountHistory,
+  getReceiverAccountDetails,
+  sendPayment
 } from "../store";
 import withRedux from "next-redux-wrapper";
 
 import Layout from "../components/layout";
+import SenderAccountHistory from "../components/SenderAccountHistory";
 
 class StellarMe extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      secretKey: "SAVWL4JNTNYFAYESU7IKN5S3UDI4OROFZR3EK5UUH4EZNBIJDVV7I5KX",
+      secretKey: "SAY7IXRUGERQHGJ6S6EVCHYTYBXXOCDGE22W5LG74T3RUAW5WXBBNXTL",
       senderAccountDetails: {},
       receiverAccountDetails: {
         receiverPublicAddress: "",
@@ -34,10 +37,10 @@ class StellarMe extends React.Component {
     //   this.props.url.query.cProps.reqParams.length
     // ) {
     console.log("inside cdm if");
-    const receiverUsername = this.props.url.query.cProps.reqParams.username
+    const receiverUsername = this.props.url.query.cProps && this.props.url.query.cProps.reqParams.username
       ? this.props.url.query.cProps.reqParams.username
       : "";
-    const receiverAmount = this.props.url.query.cProps.reqParams.amount
+    const receiverAmount = this.props.url.query.cProps && this.props.url.query.cProps.reqParams.amount
       ? this.props.url.query.cProps.reqParams.amount
       : 1;
     this.props.getReceiverAccountDetails(receiverUsername, receiverAmount);
@@ -54,6 +57,11 @@ class StellarMe extends React.Component {
     ) {
       this.setState({
         receiverAccountDetails: nextProps.receiverAccountDetails
+      });
+    }
+    if (this.props.senderAccountHistory !== nextProps.senderAccountHistory) {
+      this.setState({
+        senderAccountHistory: nextProps.senderAccountHistory
       });
     }
   }
@@ -73,6 +81,11 @@ class StellarMe extends React.Component {
 
   handleTransaction = () => {
     console.log("in confirm trans");
+    this.props.sendPayment(
+      this.state.secretKey,
+      this.state.receiverAccountDetails.receiverPublicAddress,
+      this.state.receiverAccountDetails.receiverAmount
+    );
   };
 
   handleAccountView = () => {
@@ -82,29 +95,29 @@ class StellarMe extends React.Component {
     this.props.getSenderAccountDetails(this.state.secretKey);
   };
 
+  handleViewAccountHistory = () => {
+    console.log("acc his");
+    if (
+      this.state.senderAccountDetails &&
+      this.state.senderAccountDetails.account_id
+    ) {
+      this.props.getSenderAccountHistory(
+        this.state.senderAccountDetails.account_id
+      );
+    }
+  };
+
+  // renderAccountHistory = () => {
+  //   if(this.state.senderAccountHistory && this.state.senderAccountHistory.records && this.state.senderAccountHistory.records.length){
+  //     this.state.senderAccountHistory.records.map(item => <li>{item.fee_paid} on {item.created_at}</li>);
+  //   }
+  // };
+
   render() {
     return (
       <Layout>
         <div>{this.props.loaderInfo.loaderText}</div>
-        <input
-          type="text"
-          onChange={this.handleSecretKey}
-          value={this.state.secretKey}
-        />
-        <button onClick={this.handleAccountView}>Show</button>
-        <div>
-          <h2>Account Balance</h2>
-          <ul>
-            {this.state.senderAccountDetails &&
-              this.state.senderAccountDetails.balances &&
-              this.state.senderAccountDetails.balances.length &&
-              this.state.senderAccountDetails.balances.map((item, index) => (
-                <li key={index}>
-                  {item.asset_type} : {item.balance} Lumens
-                </li>
-              ))}
-          </ul>
-        </div>
+
         <div>
           <h2>Send money</h2>
           <div>
@@ -119,8 +132,6 @@ class StellarMe extends React.Component {
             ) : (
               this.state.receiverAccountDetails.receiverPublicAddress
             )}
-          </div>
-          <div>
             Amount:
             <input
               type="number"
@@ -131,6 +142,43 @@ class StellarMe extends React.Component {
             {this.state.receiverAccountDetails.receiverAssetType}
           </div>
           <button onClick={this.handleTransaction}>Transfer Now</button>
+        </div>
+        <hr />
+        <div>
+          <input
+            type="text"
+            onChange={this.handleSecretKey}
+            value={this.state.secretKey}
+          />
+          {this.state.senderAccountDetails &&
+          this.state.senderAccountDetails.account_id ? (
+            <button onClick={this.handleViewAccountHistory}>
+              View History
+            </button>
+          ) : (
+            <button onClick={this.handleAccountView}>Sign In</button>
+          )}
+        </div>
+        <hr />
+        <div>
+          <h2>Account Balance</h2>
+          <ul>
+            {this.state.senderAccountDetails &&
+              this.state.senderAccountDetails.balances &&
+              this.state.senderAccountDetails.balances.length &&
+              this.state.senderAccountDetails.balances.map((item, index) => (
+                <li key={index}>
+                  {item.asset_type} : {item.balance} Lumens
+                </li>
+              ))}
+          </ul>
+        </div>
+        <hr />
+        <div>
+          <h2>Account History</h2>
+          <SenderAccountHistory
+            accountHistory={this.state.senderAccountHistory}
+          />
         </div>
       </Layout>
     );
@@ -144,16 +192,22 @@ function mapDispatchToProps(dispatch) {
       dispatch
     ),
     loaderStart: bindActionCreators(loaderStart, dispatch),
+    getSenderAccountHistory: bindActionCreators(
+      getSenderAccountHistory,
+      dispatch
+    ),
     getReceiverAccountDetails: bindActionCreators(
       getReceiverAccountDetails,
       dispatch
-    )
+    ),
+    sendPayment: bindActionCreators(sendPayment, dispatch)
   };
 }
 function mapStateToProps(state) {
   return {
     loaderInfo: state.loaderInfo,
     senderAccountDetails: state.senderAccountDetails,
+    senderAccountHistory: state.senderAccountHistory,
     receiverAccountDetails: state.receiverAccountDetails
   };
 }
