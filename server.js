@@ -14,7 +14,9 @@ app
     server.get("/", (req, res) => {
       return handle(req, res);
     });
-
+    server.get("/get-link", (req, res) => {
+      return handle(req, res);
+    });
     server.get("/:username/", (req, res) => {
       const actualPage = "/processor";
       const mergedQuery = Object.assign(

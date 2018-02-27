@@ -5,7 +5,7 @@ export default class SenderAccountHistory extends React.Component {
     super(props);
   }
   renderAccountHistory = () => {
-      console.log('this.props.accountHistory', this.props.accountHistory);
+      // console.log('this.props.accountHistory', this.props.accountHistory);
     if (
       this.props.accountHistory &&
       this.props.accountHistory.records &&

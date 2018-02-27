@@ -15,6 +15,10 @@ const stellarMeInitialState = {
   loaderInfo: {
     loaderStatus: false,
     loaderText: ""
+  },
+  addedNewPairInfo: {
+    isNewPairAddSuccess: "",
+    addedUsername: ""
   }
 };
 
@@ -24,7 +28,8 @@ export const actionTypes = {
   LOADER_END: "LOADER_END",
   GET_SENDER_ACCOUNT_DETAILS: "GET_SENDER_ACCOUNT_DETAILS",
   LOAD_SENDER_ACCOUNT_HISTORY: "LOAD_SENDER_ACCOUNT_HISTORY",
-  SEND_PAYMENT: "SEND_PAYMENT"
+  SEND_PAYMENT: "SEND_PAYMENT",
+  ADD_NEW_PAIR_DB_STATUS: "ADD_NEW_PAIR_DB_STATUS"
 };
 
 // REDUCERS
@@ -57,6 +62,12 @@ export const reducer = (state = stellarMeInitialState, action) => {
           loaderText: ""
         }
       };
+    case actionTypes.ADD_NEW_PAIR_DB_STATUS:
+      return {
+        ...state,
+        isNewPairAddSuccess: action.payload.isNewPairAddSuccess,
+        addedNewPairInfo: action.payload.addedNewPairInfo
+      };
     case actionTypes.LOAD_SENDER_ACCOUNT_HISTORY:
       return {
         ...state,
@@ -77,33 +88,25 @@ export const getReceiverAccountDetails = (
   receiverUsername,
   receiverAmount
 ) => dispatch => {
-  const stellarTestAccounts = [
-    {
-      username: "sudu",
-      publicKey: "GB75YERUNUZVVIDVEZ4XICJMZNX6VESSRYRQNI6ZZJ5QVIGN5DJPSD5W"
-    },
-    {
-      username: "madhu",
-      publicKey: "GBAWHX3GPP3SYUZ5AWNAYUL6AMCUYYSRROONNR4JISQ34KWCSLN3GNV5"
-    }
-  ];
-  const receiverObject = stellarTestAccounts.filter(
-    item => receiverUsername === item.username
-  );
-  const receiverPublicAddress = receiverObject.length
-    ? receiverObject[0].publicKey
-    : "";
-  console.log("receiverObject", receiverObject);
-  return dispatch({
-    type: actionTypes.GET_RECEIVER_DETAILS,
-    payload: {
-      receiverAccountDetails: {
-        receiverPublicAddress,
-        receiverAmount: receiverAmount,
-        receiverAssetType: "XLM"
-      }
-    }
-  });
+  fetch(`http://localhost:4000/users/${receiverUsername}`)
+    .then(res => {
+      console.log("res", res);
+      return res.json();
+    })
+    .then(data => {
+      console.log(data);
+      return dispatch({
+        type: actionTypes.GET_RECEIVER_DETAILS,
+        payload: {
+          receiverAccountDetails: {
+            receiverPublicAddress: data.publicKey ? data.publicKey : '',
+            receiverAmount: receiverAmount,
+            receiverAssetType: "XLM"
+          }
+        }
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 export const sendPayment = (
@@ -164,7 +167,7 @@ export const sendPayment = (
           dispatch({
             type: actionTypes.SEND_PAYMENT,
             payload: { paymentDetails: transactionResult }
-          })
+          });
           console.log(JSON.stringify(transactionResult, null, 2));
           console.log("\nSuccess! View the transaction at: ");
           console.log(transactionResult._links.transaction.href);
@@ -204,6 +207,55 @@ export const getSenderAccountDetails = sourceSecretKey => dispatch => {
     .catch(function(err) {
       console.error(err);
     });
+};
+
+export const addNewPairtoDB = (username, publicKey) => dispatch => {
+  console.log(username, publicKey);
+  fetch("http://localhost:4000/users", {
+    method: "POST",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ id: username, publicKey: publicKey })
+  }).then(res => {
+    console.log("res", res);
+    // const responseData = res.json();
+    if (res.status === 201 && res.statusText === "Created") {
+      return dispatch({
+        type: actionTypes.ADD_NEW_PAIR_DB_STATUS,
+        payload: {
+          addedNewPairInfo: {
+            isNewPairAddSuccess: true,
+            addedUsername: username
+          }
+        }
+      });
+    } else {
+      return dispatch({
+        type: actionTypes.ADD_NEW_PAIR_DB_STATUS,
+        payload: {
+          addedNewPairInfo: { isNewPairAddSuccess: false, addedUsername: "" }
+        }
+      });
+    }
+    // res.json()
+  });
+  // .catch(error => console.error('MyError:', error))
+  // .then(responseData => {
+  //   console.log(responseData);
+  //   return dispatch({
+  //     type: actionTypes.ADD_NEW_PAIR_DB_STATUS,
+  //     payload: { isSuccess: true, responseData }
+  //   });
+  // });
+  // .catch(err => {
+  //   console.log(err);
+  //   return dispatch({
+  //     type: actionTypes.ADD_NEW_PAIR_DB_STATUS,
+  //     payload: { isSuccess: false, successData: err }
+  //   });
+  // });
 };
 
 export const getSenderAccountHistory = sourcePublicKey => dispatch => {
