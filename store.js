@@ -76,7 +76,8 @@ export const reducer = (state = stellarMeInitialState, action) => {
     case actionTypes.SEND_PAYMENT:
       return {
         ...state,
-        paymentDetails: action.payload.paymentDetails
+        paymentDetails: {info: action.payload.paymentDetails,
+        isPaymentSuccess: action.payload.isPaymentSuccess}
       };
     default:
       return state;
@@ -99,7 +100,7 @@ export const getReceiverAccountDetails = (
         type: actionTypes.GET_RECEIVER_DETAILS,
         payload: {
           receiverAccountDetails: {
-            receiverPublicAddress: data.publicKey ? data.publicKey : '',
+            receiverPublicAddress: data.publicKey ? data.publicKey : "",
             receiverAmount: receiverAmount,
             receiverAssetType: "XLM"
           }
@@ -166,7 +167,10 @@ export const sendPayment = (
         .then(function(transactionResult) {
           dispatch({
             type: actionTypes.SEND_PAYMENT,
-            payload: { paymentDetails: transactionResult }
+            payload: {
+              paymentDetails: transactionResult,
+              isPaymentSuccess: true
+            }
           });
           console.log(JSON.stringify(transactionResult, null, 2));
           console.log("\nSuccess! View the transaction at: ");
@@ -175,6 +179,13 @@ export const sendPayment = (
         .catch(function(err) {
           console.log("An error has occured:");
           console.log(err);
+          dispatch({
+            type: actionTypes.SEND_PAYMENT,
+            payload: {
+              paymentDetails: transactionResult,
+              isPaymentSuccess: false
+            }
+          });
         });
     })
     .catch(function(e) {
@@ -194,6 +205,20 @@ export const getSenderAccountDetails = sourceSecretKey => dispatch => {
     .accountId(sourcePublicKey)
     .call()
     .then(function(senderAccountDetails) {
+      // adding listener to transaction for this account
+      const es = server
+        .payments()
+        .forAccount(sourcePublicKey)
+        .cursor("now")
+        .stream({
+          onmessage: function(senderAccountHistory) {
+            console.log(senderAccountHistory);
+            return dispatch({
+              type: actionTypes.LOAD_SENDER_ACCOUNT_HISTORY,
+              payload: { senderAccountHistory }
+            });
+          }
+        });
       // console.log(senderAccountDetails);
       return dispatch({
         type: actionTypes.LOADER_END
@@ -239,23 +264,7 @@ export const addNewPairtoDB = (username, publicKey) => dispatch => {
         }
       });
     }
-    // res.json()
   });
-  // .catch(error => console.error('MyError:', error))
-  // .then(responseData => {
-  //   console.log(responseData);
-  //   return dispatch({
-  //     type: actionTypes.ADD_NEW_PAIR_DB_STATUS,
-  //     payload: { isSuccess: true, responseData }
-  //   });
-  // });
-  // .catch(err => {
-  //   console.log(err);
-  //   return dispatch({
-  //     type: actionTypes.ADD_NEW_PAIR_DB_STATUS,
-  //     payload: { isSuccess: false, successData: err }
-  //   });
-  // });
 };
 
 export const getSenderAccountHistory = sourcePublicKey => dispatch => {

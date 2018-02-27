@@ -24,7 +24,8 @@ class StellarMe extends React.Component {
         receiverAmount: 1,
         receiverAssetType: "XLM"
       },
-      loaderInfo: {}
+      loaderInfo: {},
+      enableTransferButton: false
     };
   }
   componentDidMount() {
@@ -37,12 +38,16 @@ class StellarMe extends React.Component {
     //   this.props.url.query.cProps.reqParams.length
     // ) {
     console.log("inside cdm if");
-    const receiverUsername = this.props.url.query.cProps && this.props.url.query.cProps.reqParams.username
-      ? this.props.url.query.cProps.reqParams.username
-      : "";
-    const receiverAmount = this.props.url.query.cProps && this.props.url.query.cProps.reqParams.amount
-      ? this.props.url.query.cProps.reqParams.amount
-      : 1;
+    const receiverUsername =
+      this.props.url.query.cProps &&
+      this.props.url.query.cProps.reqParams.username
+        ? this.props.url.query.cProps.reqParams.username
+        : "";
+    const receiverAmount =
+      this.props.url.query.cProps &&
+      this.props.url.query.cProps.reqParams.amount
+        ? this.props.url.query.cProps.reqParams.amount
+        : 1;
     this.props.getReceiverAccountDetails(receiverUsername, receiverAmount);
     // }
   }
@@ -88,9 +93,11 @@ class StellarMe extends React.Component {
     );
   };
 
+  handleEnableSignInButton = () =>
+    this.setState({ enableTransferButton: true });
+
   handleAccountView = () => {
     console.log("in account view");
-    // var sourceSecretKey = this.state.secretKey;
     this.props.loaderStart("Getting Account details");
     this.props.getSenderAccountDetails(this.state.secretKey);
   };
@@ -141,25 +148,34 @@ class StellarMe extends React.Component {
             />
             {this.state.receiverAccountDetails.receiverAssetType}
           </div>
-          <button onClick={this.handleTransaction}>Transfer Now</button>
-        </div>
-        <hr />
-        <div>
-          <input
-            type="text"
-            onChange={this.handleSecretKey}
-            value={this.state.secretKey}
-          />
-          {this.state.senderAccountDetails &&
-          this.state.senderAccountDetails.account_id ? (
-            <button onClick={this.handleViewAccountHistory}>
-              View History
+          {!this.state.enableTransferButton ? (
+            <button onClick={this.handleEnableSignInButton}>
+              Let me Sign In
             </button>
           ) : (
-            <button onClick={this.handleAccountView}>Sign In</button>
+            ""
           )}
         </div>
-        <hr />
+        {this.state.enableTransferButton ? (
+          <div>
+            Enter your Secret Key:
+            <input
+              required
+              type="text"
+              onChange={this.handleSecretKey}
+              value={this.state.secretKey}
+            />
+            <button
+              onClick={this.handleAccountView}
+              disabled={!this.state.secretKey.length}
+            >
+              Sign In and Show Balance
+            </button>
+          </div>
+        ) : (
+          ""
+        )}
+
         <div>
           <h2>Account Balance</h2>
           <ul>
@@ -172,13 +188,16 @@ class StellarMe extends React.Component {
                 </li>
               ))}
           </ul>
-        </div>
-        <hr />
-        <div>
-          <h2>Account History</h2>
-          <SenderAccountHistory
-            accountHistory={this.state.senderAccountHistory}
-          />
+          <button onClick={this.handleTransaction}>Transfer Now</button>
+          {this.props.paymentDetails &&
+          this.props.paymentDetails.isPaymentSuccess ? (
+            <p>Payment Success.</p>
+          ) : this.props.paymentDetails &&
+          this.props.paymentDetails.isPaymentSuccess === false ? (
+            <p>Failed</p>
+          ) : (
+            ""
+          )}
         </div>
       </Layout>
     );
@@ -208,7 +227,8 @@ function mapStateToProps(state) {
     loaderInfo: state.loaderInfo,
     senderAccountDetails: state.senderAccountDetails,
     senderAccountHistory: state.senderAccountHistory,
-    receiverAccountDetails: state.receiverAccountDetails
+    receiverAccountDetails: state.receiverAccountDetails,
+    paymentDetails: state.paymentDetails
   };
 }
 
