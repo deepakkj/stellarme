@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
+
+html, body {
+  font-family: 'Open Sans', sans-serif;
+}
+body {
+  background-color: #f7f9fa;
+  padding-bottom: 90px;
+  position: relative;
+  min-height: 100vh;
+}
+
+.btn-primary {
+  border-radius: 24px;
+  padding: 10px 15px;
+  background: linear-gradient(0deg,#58b4d3 0,#695fb5 100%);
+  background: -o-linear-gradient(0deg,#58b4d3 0,#695fb5 100%);
+  border: none;
+}
+
+
+/* HEADER START */
+header {
+  min-height: 50px;
+  background-color: #fff;
+}
+
+header nav {
+
+}
+/* HEADER END */
+
+/* FOOTER START */
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 20px 0;
+  margin-top: 20px;
+  border-top: 1px solid #d4d4d4;
+  background-image: linear-gradient(to bottom,#fff,#f2f2f2);
+  background-repeat: repeat-x;
+}
+/* FOOTER END */
+
+
+/* SEND MONEY CARD START */
+.send-money-card {
+  max-width: 700px;
+  background-color: #fff;
+  margin: 50px auto 20px auto;
+}
+.send-money-card-header {
+  padding: 30px 0;
+  background: linear-gradient(180deg,#58b4d3 0,#695fb5 100%);
+  background: -o-linear-gradient(-90deg,#58b4d3 0,#695fb5 100%);
+}
+.profile-image-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  transition: all .25s ease-out;
+  background-size: contain;
+  background: url("https://www.paypalobjects.com/webstatic/paypalme/no_avatar.png") no-repeat center center;
+  border-radius: 100%;
+  background-size: cover;
+  background-position: center center;
+  background-color: rgba(255,255,255,.1);
+  box-shadow: 0 5px 12px 0 rgba(2,2,2,.3);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+/* SEND MONEY CARD END */
+
+/* SEND MONEY CARD BODY START */
+.send-money-card-body {
+  padding: 20px 10px;
+}
+
+.send-money-card-body button.btn {
+  margin: 20px auto;
+  display: block;
+  max-width: 350px;
+  width: 100%;
+  border: none;
+  background: linear-gradient(0deg,#58b4d3 0,#695fb5 100%);
+  background: -o-linear-gradient(0deg,#58b4d3 0,#695fb5 100%);
+}
+
+.receiver-address {
+  font-size: 12px;
+}
+.receiver-address input, .secret-key input  {
+  font-size: 20px;
+  border: none;
+  box-shadow: none;
+  border-bottom: 1px solid grey;
+  border-radius: 0;
+  max-width: 350px;
+  margin: 0 auto;
+}
+.receiver-address input:focus, .secret-key input:focus {
+  border-color: grey;
+  outline: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.receiver-address span:first-child {
+  color: grey;
+  text-decoration: underline;
+  text-transform: uppercase;
+}
+.receiver-address span:last-child {
+  font-size: 16px;
+  line-height: 32px;
+  word-break: break-word;
+}
+
+.secret-key {
+  position: relative;
+  padding-top: 30px;
+}
+.secret-key span {
+  display: block;
+  font-size: 12px;
+  margin-bottom: -36px;
+  color: grey;
+  text-decoration: underline;
+  text-transform: uppercase;
+}
+
+.amount-transfer {
+  margin: 0 auto 10px auto;
+  border-bottom: 1px solid grey;
+  max-width: 220px;
+}
+.amount-transfer input {
+  width: 170px;
+  font-size: 60px;
+  display: inline-block;
+  height: auto;
+  line-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.amount-transfer input:focus {
+  border-color: grey;
+  outline: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.amount-transfer span {
+  padding-left: 10px;
+  font-size: 20px;
+}
+/* SEND MONEY CARD BODY END */
+
+/* ACCOUNT HISTORY START */
+.account-history-wrapper {
+  background: #fff;
+  padding: 20px 10px;
+}
+.account-history-wrapper ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.account-history-wrapper button.btn-primary {
+  max-width: 350px;
+  width: 100%;
+}
+.balance-list-item {
+  display: inline-block;
+  border: 1px solid #e0e0e0;
+  padding: 5px 10px;
+  margin-bottom: 5px;
+}
+.asset-type {
+  font-weight: 400;
+  text-transform: capitalize;
+}
+.item-balance {
+  font-weight: 300;
+}
+/* ACCOUNT HISTORY END */

@@ -123,81 +123,119 @@ class StellarMe extends React.Component {
   render() {
     return (
       <Layout>
-        <div>{this.props.loaderInfo.loaderText}</div>
-
-        <div>
-          <h2>Send money</h2>
-          <div>
-            Receiver Address:
-            {this.state.receiverAccountDetails.receiverPublicAddress === "" ? (
-              <input
-                type="text"
-                defaultValue={
-                  this.state.receiverAccountDetails.receiverPublicAddress
-                }
-              />
-            ) : (
-              this.state.receiverAccountDetails.receiverPublicAddress
-            )}
-            Amount:
-            <input
-              type="number"
-              max={this.state.receiverAccountDetails.receiverAmount}
-              value={this.state.receiverAccountDetails.receiverAmount}
-              onChange={this.handleReceiverAmountChange}
-            />
-            {this.state.receiverAccountDetails.receiverAssetType}
+        <div className="row">
+            <div>{this.props.loaderInfo.loaderText}</div>
+            <div className="col-xs-12 col-md-offset-3 col-md-6">
+              <div className="send-money-card">
+                <div className="send-money-card-header">
+                  <div className="profile-image-container">
+                    <div className="profile-header-img current-profile-img">
+                    </div>
+                  </div>
+                </div>
+                <div className="send-money-card-body">
+                <h4 className="text-center">Send money</h4>
+                <div>
+                  {this.state.receiverAccountDetails.receiverPublicAddress === "" ? (
+                    <p className="receiver-address">
+                      <input
+                        type="text"
+                        placeholder="Enter Receiver Address"
+                        defaultValue={
+                          this.state.receiverAccountDetails.receiverPublicAddress
+                        }
+                        class="form-control"
+                      />
+                    </p>
+                  ) : (
+                    <p className="receiver-address">
+                      <span>Receiver Address: </span>
+                      <span>{this.state.receiverAccountDetails.receiverPublicAddress}</span>
+                    </p>
+                  )}
+                  <div className="amount-transfer text-center">
+                    <label class="sr-only">Amount to transfer</label>
+                    <input
+                      type="number"
+                      max={this.state.receiverAccountDetails.receiverAmount}
+                      value={this.state.receiverAccountDetails.receiverAmount}
+                      onChange={this.handleReceiverAmountChange}
+                      class="form-control text-center"
+                    />
+                    <span>{this.state.receiverAccountDetails.receiverAssetType}</span>
+                  </div>
+                </div>
+                {!this.state.enableTransferButton ? (
+                  <button
+                    onClick={this.handleEnableSignInButton}
+                    className="btn btn-primary"
+                  >
+                    Let me Sign In
+                  </button>
+                ) : (
+                  ""
+                )}
+                {this.state.enableTransferButton ? (
+                  <div>
+                    <p className="secret-key">
+                      <span>Secret Key: </span>
+                      <input
+                        required
+                        type="text"
+                        onChange={this.handleSecretKey}
+                        value={this.state.secretKey}
+                        class="form-control text-center"
+                      />
+                    </p>
+                    <button
+                      className="btn btn-primary"
+                      onClick={this.handleAccountView}
+                      disabled={!this.state.secretKey.length}
+                      className="btn btn-primary"
+                    >
+                      Sign In and Show Balance
+                    </button>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+            </div>
           </div>
-          {!this.state.enableTransferButton ? (
-            <button onClick={this.handleEnableSignInButton}>
-              Let me Sign In
-            </button>
-          ) : (
-            ""
-          )}
-        </div>
-        {this.state.enableTransferButton ? (
-          <div>
-            Enter your Secret Key:
-            <input
-              required
-              type="text"
-              onChange={this.handleSecretKey}
-              value={this.state.secretKey}
-            />
-            <button
-              onClick={this.handleAccountView}
-              disabled={!this.state.secretKey.length}
-            >
-              Sign In and Show Balance
-            </button>
-          </div>
-        ) : (
-          ""
-        )}
 
-        <div>
-          <h2>Account Balance</h2>
-          <ul>
-            {this.state.senderAccountDetails &&
-              this.state.senderAccountDetails.balances &&
-              this.state.senderAccountDetails.balances.length &&
-              this.state.senderAccountDetails.balances.map((item, index) => (
-                <li key={index}>
-                  {item.asset_type} : {item.balance} Lumens
-                </li>
-              ))}
-          </ul>
-          <button onClick={this.handleTransaction}>Transfer Now</button>
-          {this.props.paymentDetails &&
-          this.props.paymentDetails.isPaymentSuccess ? (
-            <p>Payment Success.</p>
-          ) : this.props.paymentDetails &&
-          this.props.paymentDetails.isPaymentSuccess === false ? (
-            <p>Failed</p>
-          ) : (
-            ""
-          )}
+          <div className="col-xs-12 col-md-offset-3 col-md-6">
+            <div className="account-history-wrapper text-center">
+              <h4>Account Balance</h4>
+              <ul>
+                {this.state.senderAccountDetails &&
+                  this.state.senderAccountDetails.balances &&
+                  this.state.senderAccountDetails.balances.length &&
+                  this.state.senderAccountDetails.balances.map((item, index) => (
+                    <li key={index} className="text-info">
+                      <div className="balance-list-item">
+                        <span className="asset-type">{item.asset_type} : </span><span className="item-balance">{item.balance} Lumens</span>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+              <button
+                onClick={this.handleTransaction}
+                className="btn btn-primary"
+              >
+                Transfer Now
+              </button>
+              {this.props.paymentDetails &&
+              this.props.paymentDetails.isPaymentSuccess ? (
+                <p><img className="center-block" src="/static/success.svg" />Payment Success.</p>
+              ) : this.props.paymentDetails &&
+              this.props.paymentDetails.isPaymentSuccess === false ? (
+                <p><img className="center-block" src="/static/failed.svg" />Failed</p>
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
+
         </div>
       </Layout>
     );
